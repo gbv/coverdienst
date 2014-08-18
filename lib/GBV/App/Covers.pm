@@ -6,8 +6,13 @@ use parent 'Plack::App::SeeAlso';
 use Plack::App::File;
 use Plack::Request;
 use Image::Size;
+use Business::ISBN;
+use File::Path qw(make_path);
+use HTTP::Tiny;
+use PICA::Record;
 use JSON;
 
+# constructur
 sub new {
     my ($class, $config) = @_;
 
@@ -16,11 +21,11 @@ sub new {
     local $/ = undef;
     $config = JSON->new->decode(<$fh>);
 
-    my $self = bless $config, $class;
+    bless $config, $class;
 
     # predefined properties
     $config->{Formats} = {
-        img => [ sub { $self->query_image(@_) } , 'image/jpeg' ]
+        img => [ sub { $config->query_image(@_) } , $config->{mime} ]
     };
 
     $config->{empty_gif} = eval {
@@ -31,28 +36,59 @@ sub new {
         pack '(H2)*',  map {substr($data,$_*3,2)} (0..42);
     };
 
-    $self;
+    my $agent =  $config->{ShortName} . '/' . $config->{Version};
+    $config->{http} = HTTP::Tiny->new( agent => $agent );
+
+    $config;
 }
 
+# SeeAlso response (format=seealso)
 sub query {
     my ($self, $id) = @_;
-    my ($file, $size) = $self->id2file($id);
-    if ($file) {
-        my $url = $self->{base} . "?format=img&id=$id";#?$file;
-        return [ $id, ['image/jpeg'], [$size], [$url] ];
+
+    if (my ($url, $size) = $self->lookup($id)) {
+        if ($url !~ qr{^(https?:)?//}) {
+            $url = $self->{base} . "?format=img&id=$id";
+        }
+        return [ $id, [$self->{mime}], [$size], [$url] ];
     } else {
-        return [ $id, [] ];
+        return [ $id, [], [], [] ];
     }
 }
 
-sub id2file {
+# image response (format=img)
+sub query_image {
+    my ($self, $env) = @_;
+
+    my $req = Plack::Request->new($env);
+    my $id  = $req->param('id');
+
+    if (my ($file) = $self->lookup($id)) {
+        return Plack::App::File->new(file => $file)->call($env);
+    } else {
+        return [200,['Content-Type'=>'image/gif'],[$self->{empty_gif}]];
+    }
+}
+
+# look up image file and dimensions by query identifier
+sub lookup {
     my ($self, $id) = @_;
 
-    # TODO: normalize ISBN, lookup via PPN ...
     say STDERR "ID: $id";
+    my $file;
 
-    my $file = "data/isbn/978/184/195/9781841959535.jpg";
+    if ($id =~ /gvk:ppn:([0-9x]+)$/i) {
+        $file = $self->lookup_gvkppn($1);
+    } else {
+        $file = $self->isbn2file(normalize_isbn($id));
+    }
 
+    return $self->lookup_file($file);
+}
+
+# look up image file and dimensions by image file name
+sub lookup_file {
+    my ($self, $file) = @_;
     my ($sizex, $sizey) = imgsize($file);
     if ($sizex and $sizey) {
         return ($file,"${sizex}x${sizey}");
@@ -61,18 +97,85 @@ sub id2file {
     }
 }
 
-sub query_image {
-    my ($self, $env) = @_;
+# maps ISBN to image file. Always constructs the file path.
+sub isbn2file {
+    my ($self, $isbn) = @_;
+    return unless $isbn;
 
-    my $req = Plack::Request->new($env);
-    my $id  = $req->param('id');
+    my $path = join '/', $self->{cache}->{isbn}, map { substr($isbn,$_,3) } (0,3,6);
+    make_path($path) unless -d $path;
+    return "$path/$isbn.jpg";
+}
 
-    if (my ($file) = $self->id2file($id)) {
-        # TODO: could return 403 (?)
-        return Plack::App::File->new(file => $file)->call($env);
+# maps GVK PPN to image file. Always constructs the file path.
+sub gvkppn2file {
+    my ($self, $ppn) = @_;
+    return unless $ppn;
+
+    my $path = join '/', $self->{cache}->{gvkppn}, map { substr($ppn,$_,3) } (0,3);
+    make_path($path) unless -d $path;
+    return "$path/$ppn.jpg";
+}
+
+# normalize to ISBN13
+sub normalize_isbn {
+    my ($isbn) = @_;
+    $isbn =~ s/^urn:isbn://i;
+    $isbn = Business::ISBN->new($isbn) or return;
+    return $isbn->as_isbn13->isbn;
+}
+
+# unique elements in a list
+sub uniq {
+    my %seen;
+    return grep { !$seen{$_}++ } @_;
+}
+
+# Look up a cover by PPN
+sub lookup_gvkppn {
+    my $self = shift;
+    my $ppn  = lc(shift);
+
+    # get existing cover, indexed by PPN
+    my $ppnfile = $self->gvkppn2file($ppn);
+    return $ppnfile if -e $ppnfile;
+
+    # get PICA+ record to look up cover link
+    my $url = "http://unapi.gbv.de/?id=gvk:ppn:$ppn&format=pp";
+    my $response = $self->{http}->get($url);
+    return unless $response->{success};
+    my $pica = PICA::Record->new($response->{content});
+    return unless $pica;
+
+    # collect unique ISBNs in the record
+    my @isbns = uniq( 
+                    grep { $_ } map { normalize_isbn($_) }
+                    map { $pica->values($_) } ('004A$A', '004A$0')
+                );
+    
+    # collect cover links in the record
+    $url = $pica->sf('009Q$a') || "";
+    my $urltype = $pica->sf('009Q$3') || 0;
+    if ( $url =~ /\.jpg/ and $urltype == 93 ) {
+        $response = $self->{http}->mirror($url, $ppnfile);
+        if ($response->{success}) {
+            foreach my $isbn (@isbns) {
+                my $isbnfile = $self->isbn2file($isbn);
+                symlink ($ppnfile, $isbnfile) unless -e $isbnfile;
+            }
+            return $ppnfile;
+        }
     }
 
-    return [200,['Content-Type'=>'image/gif'],[$self->{empty_gif}]];
+    foreach my $isbn (@isbns) { 
+        my $isbnfile = $self->isbn2file($isbn);
+        if (-e $isbnfile) {
+            symlink $isbnfile, $ppnfile;
+            return $isbnfile;
+        }
+    }
+
+    return;
 }
 
 1;
