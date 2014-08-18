@@ -1,0 +1,2 @@
+#!/bin/bash
+find data/ -not -type d -printf "%Y %p %l\n"

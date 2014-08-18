@@ -74,16 +74,22 @@ sub query_image {
 sub lookup {
     my ($self, $id) = @_;
 
-    say STDERR "ID: $id";
-    my $file;
-
     if ($id =~ /gvk:ppn:([0-9x]+)$/i) {
-        $file = $self->lookup_gvkppn($1);
+        return $self->lookup_via_gvkppn($1);
     } else {
-        $file = $self->isbn2file(normalize_isbn($id));
+        return $self->lookup_via_isbn($id);
     }
+}
 
+# look up image file and dimensions by isbn
+sub lookup_via_isbn {
+    my ($self, $isbn) = @_;
+    my $file = $self->isbn2file(normalize_isbn($isbn));
     return $self->lookup_file($file);
+    
+    # TODO: search GVK via SRU for ISBN and check PPN covers
+    # otherwise lookup via ISBN is not possible unless first lookup via PPN took place
+
 }
 
 # look up image file and dimensions by image file name
@@ -102,7 +108,7 @@ sub isbn2file {
     my ($self, $isbn) = @_;
     return unless $isbn;
 
-    my $path = join '/', $self->{cache}->{isbn}, map { substr($isbn,$_,3) } (0,3,6);
+    my $path = join '/', $self->{cache}, 'isbn', map { substr($isbn,$_,3) } (0,3,6);
     make_path($path) unless -d $path;
     return "$path/$isbn.jpg";
 }
@@ -112,7 +118,7 @@ sub gvkppn2file {
     my ($self, $ppn) = @_;
     return unless $ppn;
 
-    my $path = join '/', $self->{cache}->{gvkppn}, map { substr($ppn,$_,3) } (0,3);
+    my $path = join '/', $self->{cache}, 'gvkppn', map { substr($ppn,$_,3) } (0,3);
     make_path($path) unless -d $path;
     return "$path/$ppn.jpg";
 }
@@ -132,13 +138,15 @@ sub uniq {
 }
 
 # Look up a cover by PPN
-sub lookup_gvkppn {
+sub lookup_via_gvkppn {
     my $self = shift;
     my $ppn  = lc(shift);
 
     # get existing cover, indexed by PPN
     my $ppnfile = $self->gvkppn2file($ppn);
-    return $ppnfile if -e $ppnfile;
+    if (-e $ppnfile) {
+        return $self->lookup_file($ppnfile);
+    }
 
     # get PICA+ record to look up cover link
     my $url = "http://unapi.gbv.de/?id=gvk:ppn:$ppn&format=pp";
@@ -161,17 +169,24 @@ sub lookup_gvkppn {
         if ($response->{success}) {
             foreach my $isbn (@isbns) {
                 my $isbnfile = $self->isbn2file($isbn);
-                symlink ($ppnfile, $isbnfile) unless -e $isbnfile;
+                my $cache = $self->{cache};
+                my $target = $ppnfile; 
+                $target =~  s{$cache}{../../../..};
+                symlink ($target, $isbnfile) unless -e $isbnfile;
             }
-            return $ppnfile;
+            return $self->lookup_file($ppnfile);
         }
     }
 
+    # find covers by ISBNs in the record
     foreach my $isbn (@isbns) { 
         my $isbnfile = $self->isbn2file($isbn);
         if (-e $isbnfile) {
-            symlink $isbnfile, $ppnfile;
-            return $isbnfile;
+            my $target = $isbnfile;
+            my $cache = $self->{cache};
+            $target =~ s{$cache}{../../..};
+            symlink $target, $ppnfile;
+            return $self->lookup_file($isbnfile);
         }
     }
 
@@ -179,3 +194,10 @@ sub lookup_gvkppn {
 }
 
 1;
+
+=head1 LIMITATION
+
+If PICA+ record has changed, one must delete all ISBN->PPN symlinks and PPN
+file.
+
+=cut
