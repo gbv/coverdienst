@@ -1,0 +1,22 @@
+.TH "COVERDIENST" "1" "" "Manual" ""
+.SH GBV Coverdienst
+.PP
+Diese Anwendung stellt einen SeeAlso\-Dienst bereit, um Coverbilder
+abzufragen.
+.IP \[bu] 2
+\f[C]format=img\f[] liefert zu einer Anfrage\-ID eine Bilddatei mit dem
+Cover oder, falls kein Cover gefunden wurde, ein 1x1 Pixel großes
+transparentes GIF.
+.IP \[bu] 2
+\f[C]format=seealso\f[] liefert Informationen über das Cover zu einer
+Anfrage\-ID, bestehend aus MIMIE\-Type (in der Regel
+\f[C]image/jpeg\f[]), Bildgröße in Pixel und Anfrage\-URL.
+.PP
+The application is packaged as Debian package and installed at
+.PP
+/srv/coverdienst/ \- application files /var/log/coverdienst/ \- log
+files /etc/init.d/coverdienst \- init script
+.PP
+The application has been tested on Ubuntu >= 14.04.
+.PP
+See \f[C]\&.travis.yml\f[] for internals.

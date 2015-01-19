@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+use v5.14;
+use GBV::App::Covers;
+my $app = GBV::App::Covers->new({ cache => (shift @ARGV || 'data') });
+while(<>) {
+    chomp;
+    say $app->isbn2file($_);
+}

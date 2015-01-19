@@ -9,7 +9,7 @@ use Image::Size;
 use Business::ISBN;
 use File::Path qw(make_path);
 use HTTP::Tiny;
-use PICA::Record;
+use PICA::Data;
 use JSON;
 
 # constructur
@@ -17,9 +17,11 @@ sub new {
     my ($class, $config) = @_;
 
     # load all properties from config file
-    open my $fh, '<:encoding(UTF-8)', $config;
-    local $/ = undef;
-    $config = JSON->new->decode(<$fh>);
+    unless (ref $config) {
+        open my $fh, '<:encoding(UTF-8)', $config;
+        local $/ = undef;
+        $config = JSON->new->decode(<$fh>);
+    }
 
     bless $config, $class;
 
@@ -152,7 +154,7 @@ sub lookup_via_gvkppn {
     my $url = "http://unapi.gbv.de/?id=gvk:ppn:$ppn&format=pp";
     my $response = $self->{http}->get($url);
     return unless $response->{success};
-    my $pica = PICA::Record->new($response->{content});
+    my $pica = PICA::Data::pica_parser('plain', \$response->{content});
     return unless $pica;
 
     # collect unique ISBNs in the record

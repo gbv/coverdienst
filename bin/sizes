@@ -1,0 +1,11 @@
+#!/usr/bin/env perl
+#ABSTRACT: Kopiert ISBN-Coverdateien in neue Dateistruktur
+use v5.14;
+use GBV::App::Covers;
+my $app = GBV::App::Covers->new({ cache => (shift @ARGV || 'data') });
+use File::Find;
+find(sub {
+    next if -d $_;
+    say join ' ', $app->lookup_file($_);
+}, $app->{cache});
+

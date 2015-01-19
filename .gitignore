@@ -1,0 +1,14 @@
+data/
+local/
+
+debian/files
+debian/coverdienst.debhelper.log
+debian/coverdienst.postinst.debhelper
+debian/coverdienst.postrm.debhelper
+debian/coverdienst.prerm.debhelper
+debian/coverdienst.substvars
+debian/coverdienst/
+
+coverdienst_*.changes
+coverdienst_*.deb
+
