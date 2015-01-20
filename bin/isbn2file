@@ -1,8 +1,24 @@
 #!/usr/bin/env perl
-use v5.14;
+#ABSTRACT: Ermittelt Dateistruktur aus ISBN bzw. ISBN-Datei
+use v5.14.1;
+use lib 'lib';
 use GBV::App::Covers;
-my $app = GBV::App::Covers->new({ cache => (shift @ARGV || 'data') });
-while(<>) {
-    chomp;
-    say $app->isbn2file($_);
+my $app = GBV::App::Covers->new("covers.json");
+use Business::ISBN;
+
+if (@ARGV) {
+    isbn2file(@ARGV) for @ARGV;
+} else {
+    while (<>) {
+        isbn2file($_);
+    }
+}
+
+sub isbn2file {
+    my $isbn = shift;
+    $isbn =~ s{^.+/|(\.jpg)?\n?$|[- ]}{}g;
+    if (length $isbn == 10) {
+        $isbn = Business::ISBN->new($isbn)->as_isbn13->isbn;
+    } 
+    say ($app->isbn2file($isbn) // '');
 }

@@ -108,7 +108,7 @@ sub lookup_file {
 # maps ISBN to image file. Always constructs the file path.
 sub isbn2file {
     my ($self, $isbn) = @_;
-    return unless $isbn;
+    return unless $isbn and $isbn =~ /^97[89][0-9]{10}$/;
 
     my $path = join '/', $self->{cache}, 'isbn', map { substr($isbn,$_,3) } (0,3,6);
     make_path($path) unless -d $path;
@@ -118,7 +118,7 @@ sub isbn2file {
 # maps GVK PPN to image file. Always constructs the file path.
 sub gvkppn2file {
     my ($self, $ppn) = @_;
-    return unless $ppn;
+    return unless $ppn; # TODO: validate PPN
 
     my $path = join '/', $self->{cache}, 'gvkppn', map { substr($ppn,$_,3) } (0,3);
     make_path($path) unless -d $path;

@@ -1,8 +1,20 @@
 .TH "COVERDIENST" "1" "" "Manual" ""
-.SH GBV Coverdienst
+.SH NAME
 .PP
-Diese Anwendung stellt einen SeeAlso\-Dienst bereit, um Coverbilder
-abzufragen.
+coverdienst \- Cover images as SeeAlso service
+.SH SYNOPSIS
+.PP
+The application is automatically started as service, listening on port
+6027.
+.IP
+.nf
+\f[C]
+sudo\ service\ coverdienst\ {status|start|stop|restart}
+\f[]
+.fi
+.SH DESCRIPTION
+.PP
+Coverdienst provides a SeeAlso web service for cover images.
 .IP \[bu] 2
 \f[C]format=img\f[] liefert zu einer Anfrage\-ID eine Bilddatei mit dem
 Cover oder, falls kein Cover gefunden wurde, ein 1x1 Pixel großes
@@ -11,12 +23,25 @@ transparentes GIF.
 \f[C]format=seealso\f[] liefert Informationen über das Cover zu einer
 Anfrage\-ID, bestehend aus MIMIE\-Type (in der Regel
 \f[C]image/jpeg\f[]), Bildgröße in Pixel und Anfrage\-URL.
+.SH INSTALLATION
 .PP
 The application is packaged as Debian package and installed at
+\f[C]/srv/coverdienst/\f[].
+Log files are located at \f[C]/var/log/coverdienst/\f[].
+.SH CONFIGURATION
 .PP
-/srv/coverdienst/ \- application files /var/log/coverdienst/ \- log
-files /etc/init.d/coverdienst \- init script
+See \f[C]/etc/default/wmbeacons\f[] for basic configuration and
+\f[C]/srv/coverdienst/covers.json\f[] for additional settings.
+Restart is needed after changes.
 .PP
-The application has been tested on Ubuntu >= 14.04.
+Cover images are held in a special directory structure in
 .PP
-See \f[C]\&.travis.yml\f[] for internals.
+\f[C]/srv/coverdienst/data/\f[]
+.PP
+\f[C]/srv/coverdienst/bin\f[] contains some maintainance scripts (can be
+called via \f[C]carton\ exec\ \-Ilib\f[]).
+The script \f[C]isbn2file\f[] can be used to map a given ISBN or ISBN
+file to the corresponding cover image filename.
+.SH SEE ALSO
+.PP
+Source code at <https://github.com/gbv/coverdienst>

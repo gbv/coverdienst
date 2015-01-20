@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
-#ABSTRACT: Kopiert ISBN-Coverdateien in neue Dateistruktur
-use v5.14;
+use v5.14.1;
+use lib 'lib';
 use GBV::App::Covers;
-my $app = GBV::App::Covers->new({ cache => (shift @ARGV || 'data') });
+my $app = GBV::App::Covers->new("covers.json");
 use File::Find;
 find(sub {
     next if -d $_;
