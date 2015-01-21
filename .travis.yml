@@ -4,8 +4,9 @@ perl:
 before_install:
     - sudo apt-get update -qq
     - sudo apt-get install fakeroot dpkg-dev
-    - sudo apt-get install cpanminus starman
+    - sudo apt-get install `perl -nE 'next unless $_ =~ s/^Depends:\s+//; $_ =~ s/[, ]+|\([^)]+\)/ /g; say' < debian/control`
 install:
+    - sudo apt-get install cpanminus
     - sudo cpanm Carton
     - carton install --deployment
 script:
