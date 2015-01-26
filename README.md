@@ -28,7 +28,7 @@ The application is packaged as Debian package and installed at
 
 # CONFIGURATION
 
-See `/etc/default/wmbeacons` for basic configuration and
+See `/etc/default/coverdienst` for basic configuration and
 `/srv/coverdienst/covers.json` for additional settings. Restart is needed after
 changes. 
 
