@@ -1,8 +1,16 @@
-use v5.14;
+use v5.14.1;
 use Test::More;
-use GBV::App::Covers;
+use Plack::Test;
+use HTTP::Request::Common;
 
-my $app = GBV::App::Covers->new({});
-isa_ok($app, 'GBV::App::Covers');
+use lib 't';
+use AppLoader;
+my $app = AppLoader->new( coverdienst => 'GBV::App::Covers' );
+
+test_psgi $app, sub {
+    my $cb = shift;
+    my $res = $cb->(GET '/');
+    is $res->code, '300', '/ => 300';
+};
 
 done_testing;

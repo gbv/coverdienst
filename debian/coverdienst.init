@@ -11,7 +11,7 @@
 ### END INIT INFO
 
 PACKAGE=`basename $0`
-PIDFILE=/var/run/$PACKAGE.pid
+PIDFILE=/srv/$PACKAGE/$PACKAGE.pid
 
 [ -f /etc/default/$PACKAGE ] && . /etc/default/$PACKAGE
 
@@ -44,39 +44,39 @@ stop () {
         retval=$?
         [ $retval -eq 0 ] && rm -f $PIDFILE
         echo "done"
-        exit
+        return
     echo
         exit $retval
     fi
     echo "pid $PIDFILE not found"
     echo
-    exit 1
 }
 
 status () {
   if [ -f $PIDFILE ]; then
-    kill -0 `cat $PIDFILE` &> /dev/null
+    PID=`cat $PIDFILE`
+    kill -0 $PID &> /dev/null
     retval=$?
     if [ $retval -eq 0 ]; then
-      echo "$0 is running"
+      echo "$0 is running with PID $PID on port $PORT"
+      ss -tlnp "( sport = :$PORT )"
       exit 0
     else
       echo "$0 is not running, but pidfile $PIDFILE exists"
-      exit 1
     fi
   else
     echo "$0 is not running"
-    exit 1
   fi
 }
 
 case "$1" in
     start|stop|status)
         $1
+        exit 1
     ;;
     restart)
-        start
         stop
+        start
     ;;
     *)
         echo "Usage: $0 {start|stop|restart|status}" >&2

@@ -1,17 +1,23 @@
-language: perl
-perl:
-    - 5.14
+language: bash
 before_install:
-    - export PACKAGE=`perl -nE 'say $1 if /^Package:\s+(.+)/' < debian/control`
-    - export DEPENDS=`perl -nE 'next unless $_ =~ s/^Depends:\s+//; $_ =~ s/[, ]+|\([^)]+\)/ /g; say' < debian/control`
-    - sudo apt-get update -qq
-    - sudo apt-get install fakeroot dpkg-dev ${DEPENDS}
+    - sudo make dependencies
 install:
-    - sudo cpanm Carton
+    # don't use perlbrew
+    - sudo chown -R travis:travis /home/travis/.cpanm
     - carton install --deployment
 script:
-    - make debian-package
+    - export PACKAGE=`perl -ne 'print $1 if /^Package:\s+(.+)/;' < debian/control`
+    - export TEST_URL=app
+    - carton exec -- prove -Ilib -v
+    - make release-file
     - sudo dpkg -i ${PACKAGE}_*.deb
     - sudo service ${PACKAGE} status
-    - carton exec prove -Ilib --verbose 
+    - sudo service ${PACKAGE} restart
+    - sudo service ${PACKAGE} status
+    - export TEST_URL=deployed
+    - carton exec -- prove -Ilib -v
 cache: apt
+after_failure:
+    - tail -200 /var/log/${PACKAGE}/error.log
+    - tail -200 /var/log/${PACKAGE}/access.log
+    - curl -i http://localhost:6027/ 
