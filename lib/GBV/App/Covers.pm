@@ -16,6 +16,8 @@ use JSON;
 sub new {
     my ($class, $config) = @_;
 
+    $config ||= "covers.json";
+
     # load all properties from config file
     unless (ref $config) {
         open my $fh, '<:encoding(UTF-8)', $config;
@@ -97,6 +99,7 @@ sub lookup_via_isbn {
 # look up image file and dimensions by image file name
 sub lookup_file {
     my ($self, $file) = @_;
+    return unless -f $file;
     my ($sizex, $sizey) = imgsize($file);
     if ($sizex and $sizey) {
         return ($file,"${sizex}x${sizey}");
@@ -139,6 +142,18 @@ sub uniq {
     return grep { !$seen{$_}++ } @_;
 }
 
+# get PICA+ record via unAPI
+sub get_pica_record {
+    my ($self, $dbkey, $ppn) = @_;
+
+    my $url = $self->{unapi} . "?id=$dbkey:ppn:$ppn&format=pp";
+    my $res = $self->{http}->get($url);
+
+    $res->{success}
+        ? PICA::Parser::Plain->new( fh => \$res->{content}, bless => 1 )->next
+        : undef;
+}
+
 # Look up a cover by PPN
 sub lookup_via_gvkppn {
     my $self = shift;
@@ -146,17 +161,13 @@ sub lookup_via_gvkppn {
 
     # get existing cover, indexed by PPN
     my $ppnfile = $self->gvkppn2file($ppn);
-    if (-e $ppnfile) {
+    if (-f $ppnfile) {
         return $self->lookup_file($ppnfile);
     }
 
-    # get PICA+ record to look up cover link
-    my $url = "http://unapi.gbv.de/?id=gvk:ppn:$ppn&format=pp";
-    my $response = $self->{http}->get($url);
-    return unless $response->{success};
-    my $pica = PICA::Data::pica_parser('plain', \$response->{content});
-    return unless $pica;
+    my $pica = $self->get_pica_record( gvk => $ppn ) or return;
 
+    say $pica;
     # collect unique ISBNs in the record
     my @isbns = uniq( 
                     grep { $_ } map { normalize_isbn($_) }
@@ -164,11 +175,11 @@ sub lookup_via_gvkppn {
                 );
     
     # collect cover links in the record
-    $url = $pica->sf('009Q$a') || "";
-    my $urltype = $pica->sf('009Q$3') || 0;
-    if ( $url =~ /\.jpg/ and $urltype == 93 ) {
-        $response = $self->{http}->mirror($url, $ppnfile);
-        if ($response->{success}) {
+    my $url  = $pica->value('009Q$a') || "";
+    my $type = $pica->value('009Q$3') || "";
+    if ( $url =~ /\.jpg/ and $type eq '93' ) {
+        my $res = $self->{http}->mirror($url, $ppnfile);
+        if ($res->{success}) {
             foreach my $isbn (@isbns) {
                 my $isbnfile = $self->isbn2file($isbn);
                 my $cache = $self->{cache};

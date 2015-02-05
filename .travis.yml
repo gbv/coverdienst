@@ -13,7 +13,6 @@ script:
     - sudo dpkg -i ${PACKAGE}_*.deb
     - sudo service ${PACKAGE} status
     - sudo service ${PACKAGE} restart
-    - sudo service ${PACKAGE} status
     - export TEST_URL=deployed
     - carton exec -- prove -Ilib -v
 cache: apt

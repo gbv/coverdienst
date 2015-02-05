@@ -208,6 +208,15 @@ DISTRIBUTIONS
       File::Spec 0.8
       Pod::Man 0
       perl 5.006
+  Fennec-Lite-0.004
+    pathname: E/EX/EXODIST/Fennec-Lite-0.004.tar.gz
+    provides:
+      Fennec::Lite 0.004
+    requirements:
+      List::Util 0
+      Test::Builder 0
+      Test::More 0
+      perl 5.006
   File-ShareDir-1.102
     pathname: R/RE/REHSACK/File-ShareDir-1.102.tar.gz
     provides:
@@ -432,15 +441,25 @@ DISTRIBUTIONS
       perl 5.006
       strict 0
       warnings 0
-  PICA-Data-0.24
-    pathname: V/VO/VOJ/PICA-Data-0.24.tar.gz
+  Module-Runtime-0.014
+    pathname: Z/ZE/ZEFRAM/Module-Runtime-0.014.tar.gz
     provides:
-      PICA::Data 0.24
-      PICA::Parser::Base 0.24
-      PICA::Parser::Plain 0.24
-      PICA::Parser::Plus 0.24
-      PICA::Parser::XML 0.24
-      PICA::Path 0.24
+      Module::Runtime 0.014
+    requirements:
+      Module::Build 0
+      Test::More 0
+      perl 5.006
+      strict 0
+      warnings 0
+  PICA-Data-0.25
+    pathname: V/VO/VOJ/PICA-Data-0.25.tar.gz
+    provides:
+      PICA::Data 0.25
+      PICA::Parser::Base 0.25
+      PICA::Parser::Plain 0.25
+      PICA::Parser::Plus 0.25
+      PICA::Parser::XML 0.25
+      PICA::Path 0.25
       PICA::Writer::Base 0.23
       PICA::Writer::Plain 0.23
       PICA::Writer::Plus 0.23
@@ -857,3 +876,14 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 6.31
       Test::More 0.88
+  aliased-0.34
+    pathname: E/ET/ETHER/aliased-0.34.tar.gz
+    provides:
+      aliased 0.34
+    requirements:
+      Carp 0
+      Exporter 0
+      Module::Build::Tiny 0.039
+      perl 5.006
+      strict 0
+      warnings 0

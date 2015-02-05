@@ -21,7 +21,7 @@ sub new {
         };
         return app_from_url("http://localhost:".$conf{PORT});
     } elsif ($url =~ qr{^https?://}) {
-        $url = 'http';
+        return app_from_url($url);
     } elsif ($url eq 'app' or (!$url and !$class)) {
         return Plack::Util::load_psgi('bin/app.psgi');
     } elsif ($url) {
@@ -42,8 +42,9 @@ sub app_from_url {
         my $req = Plack::Request->new(shift);
         my @headers;
         $req->headers->scan(sub { push @headers, @_ });
-        my $options = {};
+        my $options = { headers => {} };
         $options->{headers} = Hash::MultiValue->new(@headers)->mixed if @headers;
+        delete $options->{headers}->{Host}; # not allowed by HTTP::Tiny
         $options->{content} = $req->content if length($req->content);
         my $uri = $req->uri;
         $uri->scheme($scheme);
@@ -51,8 +52,7 @@ sub app_from_url {
         $uri->port($port);
         printf "# %s %s\n", $req->method, $uri;
         my $res = HTTP::Tiny->new->request( $req->method, $uri, $options );
-        use Data::Dumper;
-        print STDERR "# " . Dumper($res)."\n";
+        say "# ".$res->{content} if $res->{status} == 599;
         return Plack::Response->new( $res->{status}, $res->{headers}, $res->{content} )->finalize;
     };
 }
