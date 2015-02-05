@@ -208,15 +208,6 @@ DISTRIBUTIONS
       File::Spec 0.8
       Pod::Man 0
       perl 5.006
-  Fennec-Lite-0.004
-    pathname: E/EX/EXODIST/Fennec-Lite-0.004.tar.gz
-    provides:
-      Fennec::Lite 0.004
-    requirements:
-      List::Util 0
-      Test::Builder 0
-      Test::More 0
-      perl 5.006
   File-ShareDir-1.102
     pathname: R/RE/REHSACK/File-ShareDir-1.102.tar.gz
     provides:
@@ -438,16 +429,6 @@ DISTRIBUTIONS
       JSON::PP 2
       Pod::Man 0
       TAP::Harness::Env 0
-      perl 5.006
-      strict 0
-      warnings 0
-  Module-Runtime-0.014
-    pathname: Z/ZE/ZEFRAM/Module-Runtime-0.014.tar.gz
-    provides:
-      Module::Runtime 0.014
-    requirements:
-      Module::Build 0
-      Test::More 0
       perl 5.006
       strict 0
       warnings 0
@@ -876,14 +857,3 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 6.31
       Test::More 0.88
-  aliased-0.34
-    pathname: E/ET/ETHER/aliased-0.34.tar.gz
-    provides:
-      aliased 0.34
-    requirements:
-      Carp 0
-      Exporter 0
-      Module::Build::Tiny 0.039
-      perl 5.006
-      strict 0
-      warnings 0
