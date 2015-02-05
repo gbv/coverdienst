@@ -14,9 +14,9 @@ use JSON;
 
 # constructur
 sub new {
-    my ($class, $config) = @_;
+    my ($class) = @_;
 
-    $config ||= "covers.json";
+    my ($config) = grep { -e $_ } qw(etc/coverdienst.json /etc/coverdienst/coverdienst.json);
 
     # load all properties from config file
     unless (ref $config) {

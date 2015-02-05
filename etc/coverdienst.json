@@ -8,7 +8,7 @@
     { "id": "urn:isbn:9789870558828" }
   ],
   "mime": "image/jpeg",
-  "base": "/",
+  "base": "//ws.gbv.de/covers/",
   "cache": "data",
   "unapi": "http://unapi.gbv.de/"
 }

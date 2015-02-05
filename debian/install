@@ -3,4 +3,4 @@ cpanfile.snapshot   srv/coverdienst
 bin/*               srv/coverdienst/bin
 lib/*               srv/coverdienst/lib
 local/*             srv/coverdienst/local
-covers.json         srv/coverdienst
+etc/*               etc/coverdienst
