@@ -22,9 +22,7 @@ sub new {
         return app_from_url("http://localhost:".$conf{PORT});
     } elsif ($url =~ qr{^https?://}) {
         return app_from_url($url);
-    } elsif ($url eq 'app' or (!$url and !$class)) {
-        return Plack::Util::load_psgi('bin/app.psgi');
-    } elsif ($url) {
+    } elsif (-f $url) {
         return Plack::Util::load_psgi($url);
     } elsif ($class) {
         say "# testing $class";

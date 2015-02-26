@@ -1,22 +1,32 @@
 language: bash
 before_install:
-    - sudo make dependencies
+  - sudo make dependencies
 install:
-    # don't use perlbrew
-    - sudo chown -R travis:travis /home/travis/.cpanm
-    - carton install --deployment
+  - sudo chown -R travis:travis /home/travis/.cpanm
+  - carton install --deployment
 script:
-    - export PACKAGE=`perl -ne 'print $1 if /^Package:\s+(.+)/;' < debian/control`
-    - export TEST_URL=app
-    - carton exec -- prove -Ilib -v
-    - make release-file
-    - sudo dpkg -i ${PACKAGE}_*.deb
-    - sudo service ${PACKAGE} status
-    - sudo service ${PACKAGE} restart
-    - export TEST_URL=deployed
-    - carton exec -- prove -Ilib -v
+  - export PACKAGE=`perl -ne 'print $1 if /^Package:\s+(.+)/;' < debian/control`
+  - export TEST_URL=app.psgi
+  - carton exec -- prove -Ilib -v
+  - make release-file
+  - sudo dpkg -i ${PACKAGE}_*.deb
+  - sudo service ${PACKAGE} status
+  - sudo service ${PACKAGE} restart
+  - export TEST_URL=deployed
+  - carton exec -- prove -Ilib -v
 cache: apt
 after_failure:
-    - tail -200 /var/log/${PACKAGE}/error.log
-    - tail -200 /var/log/${PACKAGE}/access.log
-    - curl -i http://localhost:6027/ 
+  - tail -200 /var/log/${PACKAGE}/error.log
+  - tail -200 /var/log/${PACKAGE}/access.log
+  - curl -i http://localhost:6027/ 
+before_deploy:
+  - export RELEASE_PKG_FILE=$(ls *.deb)
+  - echo "deploying $RELEASE_PKG_FILE"
+deploy:
+  provider: releases
+  api_key:
+    secure: TVPV2HwXkCKZNqZ28Xn9sTF/bdU3wEpS0kGDWp2Jc1k2fwe0JW6I8XfoFw6XeGV1iQkXbZEQnXk0X/cudav6/SIRkVA/0Q5gcrucbDwzFlUA1Q70Na4bspcUQCiaiHWehLwHKxHOfgH7OVepSd++dPAmMWquIyK9V7Rx8JvvpsI=
+  file_glob: true
+  file: "${RELEASE_PKG_FILE}"
+  on:
+    tags: true

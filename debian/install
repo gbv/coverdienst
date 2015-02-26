@@ -1,3 +1,4 @@
+app.psgi            srv/coverdienst
 cpanfile            srv/coverdienst
 cpanfile.snapshot   srv/coverdienst
 bin/*               srv/coverdienst/bin

@@ -11,28 +11,21 @@ use File::Path qw(make_path);
 use HTTP::Tiny;
 use PICA::Data;
 use JSON;
+use Storable qw(dclone);
 
 # constructur
 sub new {
-    my ($class) = @_;
+    my ($class, $config) = @_;
 
-    my ($config) = grep { -e $_ } qw(etc/coverdienst.json /etc/coverdienst/coverdienst.json);
-
-    # load all properties from config file
-    unless (ref $config) {
-        open my $fh, '<:encoding(UTF-8)', $config;
-        local $/ = undef;
-        $config = JSON->new->decode(<$fh>);
-    }
-
-    bless $config, $class;
+    my $self = dclone($config);
+    bless $self, $class;
 
     # predefined properties
-    $config->{Formats} = {
-        img => [ sub { $config->query_image(@_) } , $config->{mime} ]
+    $self->{Formats} = {
+        img => [ sub { $self->query_image(@_) } , $self->{mime} ]
     };
 
-    $config->{empty_gif} = eval {
+    $self->{empty_gif} = eval {
        use bytes; # transparent 1x1 gif
        my $data = "47 49 46 38 39 61 01 00 01 00 80 00 00 ff ff ff "
                 . "00 00 00 21 f9 04 01 00 00 00 00 2c 00 00 00 00 "
@@ -40,10 +33,10 @@ sub new {
         pack '(H2)*',  map {substr($data,$_*3,2)} (0..42);
     };
 
-    my $agent =  $config->{ShortName} . '/' . $config->{Version};
-    $config->{http} = HTTP::Tiny->new( agent => $agent );
+    my $agent =  $self->{ShortName} . '/' . $self->{Version};
+    $self->{http} = HTTP::Tiny->new( agent => $agent );
 
-    $config;
+    $self;
 }
 
 # SeeAlso response (format=seealso)
@@ -89,11 +82,11 @@ sub lookup {
 sub lookup_via_isbn {
     my ($self, $isbn) = @_;
     my $file = $self->isbn2file(normalize_isbn($isbn));
+    
     return $self->lookup_file($file);
     
     # TODO: search GVK via SRU for ISBN and check PPN covers
     # otherwise lookup via ISBN is not possible unless first lookup via PPN took place
-
 }
 
 # look up image file and dimensions by image file name
@@ -113,7 +106,7 @@ sub isbn2file {
     my ($self, $isbn) = @_;
     return unless $isbn and $isbn =~ /^97[89][0-9]{10}$/;
 
-    my $path = join '/', $self->{cache}, 'isbn', map { substr($isbn,$_,3) } (0,3,6);
+    my $path = join '/', 'data', 'isbn', map { substr($isbn,$_,3) } (0,3,6);
     make_path($path) unless -d $path;
     return "$path/$isbn.jpg";
 }
@@ -123,7 +116,7 @@ sub gvkppn2file {
     my ($self, $ppn) = @_;
     return unless $ppn; # TODO: validate PPN
 
-    my $path = join '/', $self->{cache}, 'gvkppn', map { substr($ppn,$_,3) } (0,3);
+    my $path = join '/', 'data', 'gvkppn', map { substr($ppn,$_,3) } (0,3);
     make_path($path) unless -d $path;
     return "$path/$ppn.jpg";
 }
@@ -182,9 +175,8 @@ sub lookup_via_gvkppn {
         if ($res->{success}) {
             foreach my $isbn (@isbns) {
                 my $isbnfile = $self->isbn2file($isbn);
-                my $cache = $self->{cache};
                 my $target = $ppnfile; 
-                $target =~  s{$cache}{../../../..};
+                $target =~  s{data}{../../../..};
                 symlink ($target, $isbnfile) unless -e $isbnfile;
             }
             return $self->lookup_file($ppnfile);
@@ -196,8 +188,7 @@ sub lookup_via_gvkppn {
         my $isbnfile = $self->isbn2file($isbn);
         if (-e $isbnfile) {
             my $target = $isbnfile;
-            my $cache = $self->{cache};
-            $target =~ s{$cache}{../../..};
+            $target =~ s{data}{../../..};
             symlink $target, $ppnfile;
             return $self->lookup_file($isbnfile);
         }

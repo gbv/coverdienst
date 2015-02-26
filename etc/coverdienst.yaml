@@ -1,0 +1,16 @@
+---
+Description:
+    Liefert bei Übergabe einer ISBN ein passendes Cover im JPEG-Format (falls
+    vorhanden) oder ein 1x1 Pixel transparentes GIF (andernfalls). Für format=seealso
+    werden ein Link auf die Bilddatei und die Bildgröße geliefert, für format=img die
+    Bilddatei. In der Regel sind die Cover entweder 400 Pixel hoch (z.B. 9-78184195953-5)
+    oder 140 Pixel breit (z.B. 3-933493-20-X), es gibt aber einige Ausnahmen!
+Examples:
+  - id: 978-184195953-5
+  - id: gvk:ppn:601820754
+  - id: urn:isbn:9789870558828
+ShortName: GBV Covers
+base: //ws.gbv.de/covers/
+mime: image/jpeg
+unapi: http://unapi.gbv.de/
+...

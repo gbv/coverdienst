@@ -5,7 +5,7 @@ use HTTP::Request::Common;
 
 use lib 't';
 use AppLoader;
-my $app = AppLoader->new( coverdienst => 'GBV::App::Covers' );
+my $app = AppLoader->new( coverdienst => 'GBV::App::Coverdienst' );
 
 test_psgi $app, sub {
     my $cb = shift;
