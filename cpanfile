@@ -7,6 +7,6 @@ requires 'PICA::Data', '0.25';
 
 # not listed here because implied by required Debian packages:
 # - Plack
-# - YAML::XS
+# - JSON
 # - Image::Size
 # - Business::ISBN

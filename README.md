@@ -14,12 +14,17 @@ The application is automatically started as service, listening on port 6027.
 
 Coverdienst provides a SeeAlso web service for cover images.
 
-* `format=img` liefert zu einer Anfrage-ID eine Bilddatei mit dem Cover oder, 
-   falls kein Cover gefunden wurde, ein 1x1 Pixel großes transparentes GIF.
+* `format=img` returns a cover image or a transparent 1x1 GIF given a document
+   identifier
 
-* `format=coverdienst` liefert Informationen über das Cover zu einer Anfrage-ID,
-   bestehend aus MIMIE-Type (in der Regel `image/jpeg`), Bildgröße in Pixel
-   und Anfrage-URL.
+* `format=seealso` returns information about a cover image in Open Search 
+   Suggestions / SeeAlso JSON format
+
+       [ id, [ type ], [ size ], [ URL ] ]
+
+   where `id` is the normalized given document identifier, `type` is
+   `image/jpeg` or `image/gif`, `size` is the image size (e.g. `300x400`),
+   and URL is the query URL with `format=img`.
 
 # INSTALLATION
 
@@ -44,8 +49,8 @@ by updates. Restart is needed after changes. The following keys are required:
    behind a HTTP proxy, this number is not affected by slow cient connections 
    but only by the time of processing each request.
 
-Additional configuration is placed in a YAML file in
-`/etc/coverdienst/coverdienst.yaml`. The following keys are recognized, among
+Additional configuration is placed in the JSON file 
+`/etc/coverdienst/coverdienst.json`. The following keys are recognized, among
 others:
 
 * `proxy` - a space-or-comma-separated list of trusted IPs or IP-ranges
@@ -57,6 +62,13 @@ Image files are located in `/srv/coverdienst/data/`. The directory
 `carton exec -Ilib`). The script `isbn2file` can be used to map a given ISBN or
 ISBN file to the corresponding cover image filename.
 
+# DEVELOPMENT
+
+```bash
+git clone https://github.com/gbv/coverdienst.git
+
+```
+   
 # SEE ALSO
 
 Changelog is located in `debian/changelog` in the source code repository.

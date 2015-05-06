@@ -7,7 +7,7 @@ our $NAME="coverdienst";
 use GBV::App::Covers;
 use Plack::Builder;
 use Plack::Request;
-use YAML::XS qw(LoadFile);
+use JSON;
 use parent 'Plack::Component';
 
 # load config file
@@ -15,8 +15,12 @@ sub config {
     my ($self, $file) = @_;
     return unless -f $file;
 
-    say $file;
-    my $config = LoadFile($file);
+    my $config = decode_json( do {
+        local $/;
+        open my $fh, "<", $file;
+        <$fh>
+    });
+
     while (my ($key, $value) = each %$config) {
         $self->{$key} = $value;
         if ($key eq 'proxy' and $value !~ /^[*]\s*$/) {
