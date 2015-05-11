@@ -39,7 +39,7 @@ A sample JavaScript client is included and served at
 The application is packaged as Debian package.
 No binaries are included, so the package should work on all
 architectures.
-It is tested with Ubuntu 12.04 LTS.
+It is tested with Ubuntu 14.04 LTS.
 .PP
 Files are installed at the following locations:
 .IP \[bu] 2
@@ -50,6 +50,8 @@ Files are installed at the following locations:
 \f[C]/etc/default/coverdienst\f[] \- server configuration
 .IP \[bu] 2
 \f[C]/etc/coverdienst/\f[] \- application configuration
+.PP
+Cover images must manually be copied to \f[C]/srv/coverdienst/data/\f[]
 .SH CONFIGURATION
 .PP
 See \f[C]/etc/default/coverdienst\f[] for basic configuration.
@@ -57,7 +59,7 @@ Settings are not modified by updates.
 Restart is needed after changes.
 The following keys are required:
 .IP \[bu] 2
-\f[C]PORT\f[] \- port number (required, 6009 by default)
+\f[C]PORT\f[] \- port number (required, 6027 by default)
 .IP \[bu] 2
 \f[C]WORKERS\f[] \- number of parallel connections (required, 5 by
 default).

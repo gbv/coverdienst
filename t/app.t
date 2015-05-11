@@ -4,9 +4,7 @@ use Plack::Test;
 use HTTP::Request::Common;
 use Plack::Util::Load;
 
-use lib 't';
-use AppLoader;
-my $app = AppLoader->new( coverdienst => 'GBV::App::Coverdienst' );
+my $app = load_app( $ENV{TEST_URL} || 'GBV::App::Coverdienst' );
 
 test_psgi $app, sub {
     my $cb = shift;

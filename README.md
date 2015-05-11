@@ -32,7 +32,7 @@ is included and served at `/coverdienst.json`.
 # INSTALLATION
 
 The application is packaged as Debian package. No binaries are included, so the
-package should work on all architectures. It is tested with Ubuntu 12.04 LTS.
+package should work on all architectures. It is tested with Ubuntu 14.04 LTS.
 
 Files are installed at the following locations:
 
@@ -41,12 +41,14 @@ Files are installed at the following locations:
 * `/etc/default/coverdienst` - server configuration
 * `/etc/coverdienst/` - application configuration
 
+Cover images must manually be copied to `/srv/coverdienst/data/`
+
 # CONFIGURATION
 
 See `/etc/default/coverdienst` for basic configuration. Settings are not modified
 by updates. Restart is needed after changes. The following keys are required:
 
-* `PORT` - port number (required, 6009 by default)
+* `PORT` - port number (required, 6027 by default)
 
 * `WORKERS` - number of parallel connections (required, 5 by default). If put 
    behind a HTTP proxy, this number is not affected by slow cient connections 

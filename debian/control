@@ -7,5 +7,5 @@ Standards-Version: 3.9.2
  
 Package: coverdienst
 Architecture: any
-Depends: perl-base (>= 5.14.1), cpanminus, starman, libxml-libxml-perl, libimage-size-perl, libbusiness-isbn-perl, libjson-perl, libplack-middleware-crossorigin-perl
+Depends: perl-base (>= 5.14.1), cpanminus, starman, libxml-libxml-perl, libimage-size-perl, libbusiness-isbn-perl, libjson-perl, libplack-middleware-crossorigin-perl, libregexp-common-perl, libnet-netmask-perl, libfile-sharedir-install-perl
 Description: coverdienst

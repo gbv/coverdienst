@@ -1,3 +1,11 @@
+coverdienst (0.14) unstable; urgency=medium
+
+  * Added coverdienst.json client 
+  * Change config file from YAML to JSON
+  * Rotate logs
+
+ -- Jakob Voß <jakob.voss@gbv.de>  Mon, 11 May 2015 11:13:23 +0200
+
 coverdienst (0.13) unstable; urgency=medium
 
   * Change config file from JSON to YAML

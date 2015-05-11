@@ -30,7 +30,7 @@ First make sure to install required Debian modules and `local/`:
 
 During development you should locally run the service with automatic restart:
 
-    $ plackup -r --port 6009
+    $ plackup -r --port 6027
     
 To run unit tests:
 

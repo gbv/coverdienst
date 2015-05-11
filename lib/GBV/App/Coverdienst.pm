@@ -1,7 +1,7 @@
 package GBV::App::Coverdienst;
 use v5.14;
 
-our $VERSION="0.13";
+our $VERSION="0.14";
 our $NAME="coverdienst";
 
 use GBV::App::Covers;
@@ -15,7 +15,6 @@ sub config {
     my ($self, $file) = @_;
     return unless -f $file;
 
-    say $file;
     my $config = decode_json( do { local (@ARGV, $/) = $file; <> } );
 
     while (my ($key, $value) = each %$config) {
@@ -33,6 +32,9 @@ sub prepare_app {
     # load config file
     $self->config( grep { -f $_ } "etc/$NAME.json", "/etc/$NAME/$NAME.json" );
 
+    # init Core app
+    $self->{_covers} = GBV::App::Covers->new($self);
+
     # build middleware stack
     $self->{app} = builder {
         enable_if { $self->{PROXY} } 'XForwardedFor', 
@@ -43,8 +45,12 @@ sub prepare_app {
             pass_through => 1;
         enable 'CrossOrigin', origins => '*';
         enable 'JSONP';        
-        GBV::App::Covers->new($self)->to_app;
+        $self->covers->to_app;
     };
+}
+
+sub covers {
+    $_[0]->{_covers};
 }
 
 sub call {

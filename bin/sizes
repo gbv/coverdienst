@@ -2,11 +2,12 @@
 use v5.14.1;
 use lib 'lib';
 use lib 'local/lib/perl5';
-use GBV::App::Covers;
-my $app = GBV::App::Covers->new("covers.json");
+use GBV::App::Coverdienst;
+my $app = GBV::App::Coverdienst->new; $app->prepare_app;
 use File::Find;
+
 find(sub {
     next if -d $_;
-    say join ' ', $app->lookup_file($_);
-}, $app->{cache});
+    say join ' ', $app->covers->lookup_file($_);
+}, $app->{cache} || 'data');
 
