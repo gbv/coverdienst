@@ -16,13 +16,24 @@ sudo\ service\ coverdienst\ {status|start|stop|restart}
 .PP
 Coverdienst provides a SeeAlso web service for cover images.
 .IP \[bu] 2
-\f[C]format=img\f[] liefert zu einer Anfrage\-ID eine Bilddatei mit dem
-Cover oder, falls kein Cover gefunden wurde, ein 1x1 Pixel großes
-transparentes GIF.
+\f[C]format=img\f[] returns a cover image or a transparent 1x1 GIF given
+a document identifier
 .IP \[bu] 2
-\f[C]format=coverdienst\f[] liefert Informationen über das Cover zu
-einer Anfrage\-ID, bestehend aus MIMIE\-Type (in der Regel
-\f[C]image/jpeg\f[]), Bildgröße in Pixel und Anfrage\-URL.
+\f[C]format=seealso\f[] returns information about a cover image in Open
+Search Suggestions / SeeAlso JSON format
+.RS 2
+.PP
+[ id, [ type ], [ size ], [ URL ] ]
+.RE
+.PP
+where \f[C]id\f[] is the normalized given document identifier,
+\f[C]type\f[] is \f[C]image/jpeg\f[] or \f[C]image/gif\f[],
+\f[C]size\f[] is the image size (e.g.
+\f[C]300x400\f[]), and URL is the query URL with \f[C]format=img\f[].
+.PP
+SeeAlso JSON format can be queried by many means.
+A sample JavaScript client is included and served at
+\f[C]/coverdienst.json\f[].
 .SH INSTALLATION
 .PP
 The application is packaged as Debian package.
@@ -53,8 +64,8 @@ default).
 If put behind a HTTP proxy, this number is not affected by slow cient
 connections but only by the time of processing each request.
 .PP
-Additional configuration is placed in a YAML file in
-\f[C]/etc/coverdienst/coverdienst.yaml\f[].
+Additional configuration is placed in the JSON file
+\f[C]/etc/coverdienst/coverdienst.json\f[].
 The following keys are recognized, among others:
 .IP \[bu] 2
 \f[C]proxy\f[] \- a space\-or\-comma\-separated list of trusted IPs or
@@ -65,13 +76,15 @@ The special value \f[C]*\f[] can be used to trust all IPs.
 .PP
 Image files are located in \f[C]/srv/coverdienst/data/\f[].
 The directory \f[C]/srv/coverdienst/bin\f[] contains some maintainance
-scripts (can be called via \f[C]carton\ exec\ \-Ilib\f[]).
+scripts.
 The script \f[C]isbn2file\f[] can be used to map a given ISBN or ISBN
 file to the corresponding cover image filename.
 .SH SEE ALSO
 .PP
-Changelog is located in \f[C]debian/changelog\f[] in the source code
+Changelog is located in file
+\f[C]debian/changelog\f[] (debian/changelog) in the source code
 repository.
 .PP
 Source code and issue tracker at <https://github.com/gbv/coverdienst>.
-See file \f[C]CONTRIBUTING.md\f[] for details.
+See file \f[C]CONTRIBUTING.md\f[] (CONTRIBUTING.md) for source code
+organization.

@@ -5,6 +5,8 @@ requires 'Plack::Middleware::CrossOrigin';
 requires 'Plack::Middleware::XForwardedFor';
 requires 'PICA::Data', '0.25';
 
+test_requires 'Plack::Util::Load';
+
 # not listed here because implied by required Debian packages:
 # - Plack
 # - JSON

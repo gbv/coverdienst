@@ -26,6 +26,9 @@ Coverdienst provides a SeeAlso web service for cover images.
    `image/jpeg` or `image/gif`, `size` is the image size (e.g. `300x400`),
    and URL is the query URL with `format=img`.
 
+SeeAlso JSON format can be queried by many means. A sample JavaScript client
+is included and served at `/coverdienst.json`.
+
 # INSTALLATION
 
 The application is packaged as Debian package. No binaries are included, so the
@@ -58,21 +61,15 @@ others:
    The special value `*` can be used to trust all IPs.
 
 Image files are located in `/srv/coverdienst/data/`. The directory
-`/srv/coverdienst/bin` contains some maintainance scripts (can be called via
-`carton exec -Ilib`). The script `isbn2file` can be used to map a given ISBN or
-ISBN file to the corresponding cover image filename.
+`/srv/coverdienst/bin` contains some maintainance scripts.  The script
+`isbn2file` can be used to map a given ISBN or ISBN file to the corresponding
+cover image filename.
 
-# DEVELOPMENT
-
-```bash
-git clone https://github.com/gbv/coverdienst.git
-
-```
-   
 # SEE ALSO
 
-Changelog is located in `debian/changelog` in the source code repository.
+Changelog is located in file [`debian/changelog`](debian/changelog) in the
+source code repository.
 
 Source code and issue tracker at <https://github.com/gbv/coverdienst>. See
-file `CONTRIBUTING.md` for details.
+file [`CONTRIBUTING.md`](CONTRIBUTING.md) for source code organization.
 

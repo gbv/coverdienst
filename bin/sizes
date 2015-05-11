@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use v5.14.1;
 use lib 'lib';
+use lib 'local/lib/perl5';
 use GBV::App::Covers;
 my $app = GBV::App::Covers->new("covers.json");
 use File::Find;

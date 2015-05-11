@@ -2,15 +2,9 @@
 set -e
 
 PACKAGE="$DPKG_MAINTSCRIPT_PACKAGE"
-CARTON=/usr/local/bin/carton
 
 case "$1" in
     configure)
-
-        # install carton, unless available
-        if [ ! -e "$CARTON" ] ; then
-            cpanm Carton
-        fi
 
         # Create group if not existing
         getent group $PACKAGE || groupadd $PACKAGE

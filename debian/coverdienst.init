@@ -22,11 +22,11 @@ start () {
         exit 5
     fi
     cd /srv/$PACKAGE
-    carton exec starman --pid $PIDFILE --daemonize \
+    starman --pid $PIDFILE --daemonize \
         --workers $WORKERS --port $PORT --user $PACKAGE \
         --error-log /var/log/$PACKAGE/error.log \
         --access-log /var/log/$PACKAGE/access.log \
-        /srv/$PACKAGE/bin/app.psgi
+        app.psgi
     retval=$?
     if [ $retval -eq 0 ]; then
         echo "done"

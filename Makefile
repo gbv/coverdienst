@@ -31,19 +31,19 @@ debian/$(PACKAGE).1: README.md debian/control
 
 # build Debian package
 release-file: documentation version
-	carton check
-	carton exec prove -Ilib
+	prove -l -Ilocal/lib/perl5
 	dpkg-buildpackage -b -us -uc -rfakeroot
 	mv ../$(PACKAGE)_$(VERSION)_*.deb .
 	git diff-index HEAD # FIXME?
 
-# do cleanup
-debian-clean:
-	fakeroot debian/rules clean
-
-# install required toolchain, Debian packages and Carton
+# install required toolchain and Debian packages
 dependencies:
 	apt-get install fakeroot dpkg-dev
 	apt-get install pandoc libghc-citeproc-hs-data 
 	apt-get install $(DEPLIST)
-	cpanm Carton
+
+local-lib:
+	rm -rf local
+	cpanm -l local --skip-satisfied --no-man-pages --notest --installdeps .
+	rm -rf local/lib/perl5/x86_64-linux/
+

@@ -15,11 +15,8 @@ sub config {
     my ($self, $file) = @_;
     return unless -f $file;
 
-    my $config = decode_json( do {
-        local $/;
-        open my $fh, "<", $file;
-        <$fh>
-    });
+    say $file;
+    my $config = decode_json( do { local (@ARGV, $/) = $file; <> } );
 
     while (my ($key, $value) = each %$config) {
         $self->{$key} = $value;
@@ -34,13 +31,18 @@ sub prepare_app {
     return if $self->{app};
 
     # load config file
-    $self->config( grep { -f $_ } "etc/$NAME.yaml", "/etc/$NAME/$NAME.yaml" );
+    $self->config( grep { -f $_ } "etc/$NAME.json", "/etc/$NAME/$NAME.json" );
 
     # build middleware stack
     $self->{app} = builder {
-        enable_if { $self->{PROXY} } 'XForwardedFor', trust => $self->{TRUST};
+        enable_if { $self->{PROXY} } 'XForwardedFor', 
+            trust => $self->{TRUST};
+        enable 'Static', 
+            path => qr{\.(html|js|css)$},
+            root => 'htdocs/',
+            pass_through => 1;
         enable 'CrossOrigin', origins => '*';
-        enable 'JSONP';
+        enable 'JSONP';        
         GBV::App::Covers->new($self)->to_app;
     };
 }

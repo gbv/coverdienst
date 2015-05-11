@@ -1,19 +1,20 @@
 language: bash
+sudo: required
 before_install:
   - sudo make dependencies
 install:
   - sudo chown -R travis:travis /home/travis/.cpanm
-  - carton install --deployment
+  - make local-libs
 script:
   - export PACKAGE=`perl -ne 'print $1 if /^Package:\s+(.+)/;' < debian/control`
   - export TEST_URL=app.psgi
-  - carton exec -- prove -Ilib -v
+  - prove -l -Ilocal/lib/perl5 -v
   - make release-file
   - sudo dpkg -i ${PACKAGE}_*.deb
   - sudo service ${PACKAGE} status
   - sudo service ${PACKAGE} restart
   - export TEST_URL=deployed
-  - carton exec -- prove -Ilib -v
+  - prove -l -v
 cache: apt
 after_failure:
   - tail -200 /var/log/${PACKAGE}/error.log
