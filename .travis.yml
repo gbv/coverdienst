@@ -1,10 +1,10 @@
 language: bash
 sudo: required
+dist: trusty
 before_install:
   - sudo make dependencies
 install:
-  - sudo chown -R travis:travis /home/travis/.cpanm
-  - make local-libs
+  - make local-lib
 script:
   - export PACKAGE=`perl -ne 'print $1 if /^Package:\s+(.+)/;' < debian/control`
   - export TEST_URL=app.psgi
@@ -13,8 +13,8 @@ script:
   - sudo dpkg -i ${PACKAGE}_*.deb
   - sudo service ${PACKAGE} status
   - sudo service ${PACKAGE} restart
-  - export TEST_URL=deployed
-  - prove -l -v
+  - export TEST_URL=http://localhost:6027/
+  - prove -Ilocal/lib/perl5 -l -v
 cache: apt
 after_failure:
   - tail -200 /var/log/${PACKAGE}/error.log
@@ -26,8 +26,9 @@ before_deploy:
 deploy:
   provider: releases
   api_key:
-    secure: TVPV2HwXkCKZNqZ28Xn9sTF/bdU3wEpS0kGDWp2Jc1k2fwe0JW6I8XfoFw6XeGV1iQkXbZEQnXk0X/cudav6/SIRkVA/0Q5gcrucbDwzFlUA1Q70Na4bspcUQCiaiHWehLwHKxHOfgH7OVepSd++dPAmMWquIyK9V7Rx8JvvpsI=
+    secure: SyeWdiJJ6+9X+KypNSe18mPDFslzXJQkA+Ihx3fagZqRxhX5XC8OcjjAjxEjiBc1bMH4zJCcX+k1ZoqRPq4M/stuNjjfav0eraGGeTVE9VSlPTprN08tj+HnLhbiZ5ymAH4yi8l63J52pU1vV63V8k7F9S9FTF1tC5oFV4aMbQo=
   file_glob: true
+  skip_cleanup: true
   file: "${RELEASE_PKG_FILE}"
   on:
     tags: true

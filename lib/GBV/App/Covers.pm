@@ -25,6 +25,8 @@ sub new {
         img => [ sub { $self->query_image(@_) } , $self->{mime} ]
     };
 
+    $self->{Stylesheet} = undef; # disable
+
     $self->{empty_gif} = eval {
        use bytes; # transparent 1x1 gif
        my $data = "47 49 46 38 39 61 01 00 01 00 80 00 00 ff ff ff "
@@ -82,9 +84,9 @@ sub lookup {
 sub lookup_via_isbn {
     my ($self, $isbn) = @_;
     my $file = $self->isbn2file(normalize_isbn($isbn));
-    
+
     return $self->lookup_file($file);
-    
+
     # TODO: search GVK via SRU for ISBN and check PPN covers
     # otherwise lookup via ISBN is not possible unless first lookup via PPN took place
 }
@@ -160,31 +162,39 @@ sub lookup_via_gvkppn {
 
     my $pica = $self->get_pica_record( gvk => $ppn ) or return;
 
-    say $pica;
     # collect unique ISBNs in the record
-    my @isbns = uniq( 
+    my @isbns = uniq(
                     grep { $_ } map { normalize_isbn($_) }
                     map { $pica->values($_) } ('004A$A', '004A$0')
                 );
-    
+
     # collect cover links in the record
-    my $url  = $pica->value('009Q$a') || "";
-    my $type = $pica->value('009Q$3') || "";
-    if ( $url =~ /\.jpg/ and $type eq '93' ) {
-        my $res = $self->{http}->mirror($url, $ppnfile);
-        if ($res->{success}) {
-            foreach my $isbn (@isbns) {
-                my $isbnfile = $self->isbn2file($isbn);
-                my $target = $ppnfile; 
-                $target =~  s{data}{../../../..};
-                symlink ($target, $isbnfile) unless -e $isbnfile;
+    # TODO: Extend PICA::Data module to simplify this
+    my $urlfields = $pica->fields('009Q');
+    foreach (@$urlfields) {
+        my ($url, $type) = ("","");
+        my @sf = splice @$_, 2;
+        while (@sf) {
+            my ($sf, $value) = splice @sf, 0, 2;
+            $url = $value if $sf eq 'a';
+            $type = $value if $sf eq '3';
+        }
+        if ( $url =~ /\.jpg/ and $type eq '93' ) {
+            my $res = $self->{http}->mirror($url, $ppnfile);
+            if ($res->{success}) {
+                foreach my $isbn (@isbns) {
+                    my $isbnfile = $self->isbn2file($isbn);
+                    my $target = $ppnfile;
+                    $target =~  s{data}{../../../..};
+                    symlink ($target, $isbnfile) unless -e $isbnfile;
+                }
+                return $self->lookup_file($ppnfile);
             }
-            return $self->lookup_file($ppnfile);
         }
     }
 
     # find covers by ISBNs in the record
-    foreach my $isbn (@isbns) { 
+    foreach my $isbn (@isbns) {
         my $isbnfile = $self->isbn2file($isbn);
         if (-e $isbnfile) {
             my $target = $isbnfile;

@@ -41,7 +41,8 @@ Files are installed at the following locations:
 * `/etc/default/coverdienst` - server configuration
 * `/etc/coverdienst/` - application configuration
 
-Cover images must manually be copied to `/srv/coverdienst/data/`
+Cover images must manually be copied to `/srv/coverdienst/data/` and chown'ed
+to user `coverdienst`.
 
 # CONFIGURATION
 

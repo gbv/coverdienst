@@ -1,3 +1,9 @@
+coverdienst (0.15) UNRELEASED; urgency=medium
+
+  * Fixed getting cover from PICA field 009Q
+
+ -- Jakob Voß <jakob.voss@gbv.de>  Wed, 07 Dec 2016 14:12:25 +0100
+
 coverdienst (0.14) unstable; urgency=medium
 
   * Added coverdienst.json client 

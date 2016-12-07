@@ -1,4 +1,3 @@
-
 # extract build information from control file and changelog
 POPEN  :=(
 PCLOSE :=)
@@ -38,8 +37,8 @@ release-file: documentation version
 
 # install required toolchain and Debian packages
 dependencies:
-	apt-get install fakeroot dpkg-dev
-	apt-get install pandoc libghc-citeproc-hs-data 
+	apt-get install fakeroot dpkg-dev debhelper
+	apt-get install pandoc
 	apt-get install $(DEPLIST)
 
 local-lib:
