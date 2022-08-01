@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<formats>
+<format name="img" type="image/jpeg" />
+<format name="opensearchdescription" type="application/opensearchdescription+xml" />
+<format name="seealso" type="text/javascript" />
+</formats>

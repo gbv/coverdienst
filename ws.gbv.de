@@ -1,0 +1,21 @@
+server {
+	listen 6027;
+	listen [::]:6027;
+
+	server_name ws.gbv.de;
+
+	root /var/www/covers;
+  	error_log /var/log/covers-error.log;
+
+	location / {
+		if ($arg_format = "img") {
+			rewrite ^.*$ /img.gif break;
+		}
+
+		if ($arg_format = "seealso") {
+			rewrite ^.*$ /seealso.json break;
+		}
+
+		index covers.xml;
+	}
+}
