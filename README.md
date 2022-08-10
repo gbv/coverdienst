@@ -50,11 +50,15 @@ Der Dienst kann nun testweise auf Port :5000 gestartet werden:
 
 Das Cache-Verzeichnis `./data` kann auch per Symlink an anderer Stelle abgelegt werden oder per Umgebungsvariable `COVERDIENST_DATA` festgelegt werden. Es muss aber vom Service schreibbar sein. Die Entfernung oder Aktualisierung von Dateien aus dem Cache wird nicht unterstützt, kann aber per Hand erfolgen. Die Unterverzeichnis des Cache ergeben sich aus der vierten bis sechsten Ziffer der ISBN (ohne Bindestriche), z.B. Cover für ISBN 9782330004576 in `./data/233/9782330004576.jpg`.
 
-Für die Installation als Service sollte der Perl-Webserver starman verwendet werden, z.B.
+Für die Installation als Service sollte der Perl-Webserver Starman verwendet werden, z.B.
 
     starman --workers 5 --port 6027
 
-Zur dauerhaften Installation als Service gibt es verschiedene Möglichkeiten, diesen Aufruf dauerhaft, d.h. beim Booten und nach Absturz des Dienst, einzurichten. Die Datei `coverdienst.service` enthält ein Beispiel für Systemd. Die Datei setzt vorraus, dass der Coverdienst in `/srv/coverdienst` als Benutzer `coverdienst` installiert ist (muss je nach Installation angepasst werden).
+Zur dauerhaften Installation als Service gibt es verschiedene Möglichkeiten, diesen Aufruf dauerhaft, d.h. beim Booten und nach Absturz des Dienst, einzurichten. Die Datei `coverdienst.service` enthält ein Beispiel für Systemd. Die Datei setzt vorraus, dass der Coverdienst in `/srv/coverdienst` als Benutzer `coverdienst` installiert ist (muss je nach Installation angepasst werden):
+
+    sudo cp coverdienst.service /etc/systemd/system
+    sudo systemctl enable coverdienst
+    sudo systemctl start coverdienst
 
 ## Alternative Implementierungen
 

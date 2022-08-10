@@ -1,11 +1,12 @@
 [Unit]
-Description=Starman
+Description=Coverdienst
+After=network.target
  
 [Service]
 Type=simple
 User=coverdienst
 Group=coverdienst
-ExecStart=starman --workers 5 --port 6027 /srv/coverdienst/app.psgi
+ExecStart=starman --workers 5 --port 6027
 Restart=always
 WorkingDirectory=/srv/coverdienst/
 Nice=19
