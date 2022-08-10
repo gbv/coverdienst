@@ -60,6 +60,14 @@ Zur dauerhaften Installation als Service gibt es verschiedene Möglichkeiten, di
     sudo systemctl enable coverdienst
     sudo systemctl start coverdienst
 
+### Logging
+
+Fehlermeldungen und Mitteilungen welche Coverdateien heruntergeladen wurden stehen im systemlog:
+
+    sudo journalctl -u coverdienst -f
+
+Um Zugriffe zu loggen, muss eine Datei `access.log` angelegt werden, an die angehängt wird.
+
 ## Alternative Implementierungen
 
 Die nginx-Konfiguration in der Datei `ws.gbv.de` implementiert einen Dummy-Server, die basierend auf dem Query-Parameter `format` eine JSON-Datei oder eine GIF-Datei (1x1 transparenter Pixel) zurückliefert, d.h. es wird immer eine gültige Antwort aber nie ein Cover zurückgeliefert.

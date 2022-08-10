@@ -2,3 +2,4 @@ config.local.json
 data/
 local/
 .cpanm/
+access.log
