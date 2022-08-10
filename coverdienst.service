@@ -1,0 +1,15 @@
+[Unit]
+Description=Starman
+ 
+[Service]
+Type=simple
+User=coverdienst
+Group=coverdienst
+ExecStart=starman --workers 5 --port 6027 /srv/coverdienst/app.psgi
+Restart=always
+WorkingDirectory=/srv/coverdienst/
+Nice=19
+LimitNOFILE=16384
+ 
+[Install]
+WantedBy=multi-user.target
