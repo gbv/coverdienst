@@ -28,13 +28,17 @@ Query-Parameter `format=seealso` liefert Informationen über das Bild (u.A. die 
 
 ## Installation und Konfiguration
 
-Die wesentlichen Schritte sind in `Makefile` zusammengefasst.
-
-Es empfiehlt sich, Perl-Module vorab als Debian-Paket zu installieren (als root):
+Es empfiehlt sich, Perl-Module vorab als Debian-Paket zu installieren (als root). Zumindest `starman` sollte als Systempaket installiert sein:
 
     sudo apt-get install libcatmandu-sru-perl libplack-perl libbusiness-isbn-perl libimage-size-perl starman
 
-Zumindest `starman` sollte als Systempaket installiert sein.
+Der Dienst kann grundsätzlich als beliebiger Nutzer laufen, es empfiehlt sich aber ein spezieller Account:
+
+    sudo adduser --home /srv/coverdienst coverdienst --disabled-password
+    sudo -iu coverdienst
+    git clone --bare https://github.com/gbv/coverdienst.git .git
+    git config --unset core.bare
+    git checkout
 
 Die noch fehlenden Perl-Module werden in `./local` installiert:
 

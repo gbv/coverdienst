@@ -1,6 +1,6 @@
 requires 'perl', '5.14.1';
 
-requires 'PICA::Data';
+requires 'PICA::Data', '2.0';
 requires 'Plack::App::SeeAlso';
 requires 'Plack::Middleware::CrossOrigin';
 requires 'Plack::Middleware::XForwardedFor';
