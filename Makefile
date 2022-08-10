@@ -5,4 +5,4 @@ run:
 	plackup -r
 
 test:
-	prove -lv
+	prove -lv -Ilocal/lib/perl5
